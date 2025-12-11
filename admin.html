@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Inpod Fans – Registration Dashboard</title>
+  <title>Inpod Fans Product Registration</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -10,13 +10,11 @@
       --bg-gradient-from: #f9fafb;
       --bg-gradient-to:   #e5e7eb;
       --card-bg: #ffffff;
-      --card-soft: #f9fafb;
       --accent:  #f97316;
       --accent-soft: #ffedd5;
       --accent-dark: #ea580c;
       --text-main: #0f172a;
-      --text-muted: #6b7280;
-      --border-subtle: #e5e7eb;
+      --text-muted: #64748b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -26,43 +24,57 @@
       padding: 20px;
       color: var(--text-main);
     }
-    .container { max-width: 1100px; margin: 0 auto; }
-
-    h1 {
-      font-size: 26px;
-      margin-bottom: 6px;
-      color: #0f172a;
+    .container { max-width: 640px; margin: 0 auto; }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
-    .subtitle {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 16px;
+    .logo-wrapper img {
+      width: 180px;
+      max-width: 70%;
+      height: auto;
     }
-
+    .lang-switch {
+      display: flex;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      padding: 4px;
+      border-radius: 999px;
+    }
+    .lang-btn {
+      border: none;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      cursor: pointer;
+      background: transparent;
+      color: #4b5563;
+    }
+    .lang-btn.active {
+      background: #f97316;
+      color: #111827;
+      font-weight: 600;
+    }
     .card {
       background: var(--card-bg);
       border-radius: 16px;
-      padding: 18px 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 10px 30px rgba(15,23,42,0.08);
-      border: 1px solid var(--border-subtle);
+      padding: 18px 20px 20px 20px;
+      box-shadow: 0 18px 45px rgba(15,23,42,0.18);
+      border: 1px solid #e5e7eb;
     }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: 15px;
-      font-weight: 600;
+    .card-header { margin-bottom: 12px; }
+    .card-header h1 {
+      font-size: 22px;
+      margin-bottom: 4px;
+      color: #111827;
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #111827;
     }
-    .section-title span.icon {
+    .card-header h1 span.icon {
       width: 24px;
       height: 24px;
       border-radius: 999px;
@@ -70,18 +82,22 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 13px;
+      font-size: 14px;
     }
-
+    .card-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
     .pill {
       font-size: 11px;
-      border-radius: 999px;
-      padding: 4px 9px;
-      background: #e5e7eb;
-      color: #111827;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #374151;
+      margin-top: 6px;
     }
     .pill span.dot {
       width: 7px;
@@ -89,277 +105,650 @@
       border-radius: 999px;
       background: #22c55e;
     }
-
-    .stats-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px 14px;
+      margin-top: 8px;
     }
-    .stat-card {
-      flex: 1;
-      min-width: 150px;
-      background: var(--card-soft);
-      border-radius: 14px;
-      padding: 10px 12px;
-      border: 1px solid var(--border-subtle);
+    @media (min-width: 640px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .full-width { grid-column: 1 / -1; }
     }
-    .stat-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 3px;
-    }
-    .stat-value {
-      font-size: 18px;
+    label {
+      display: block;
+      font-size: 12px;
       font-weight: 600;
       color: #111827;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
-    .stat-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    table {
+    input, select {
       width: 100%;
-      border-collapse: collapse;
+      padding: 10px 12px;
+      border: 1.8px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: 0.2s;
+      font-family: inherit;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 2px rgba(249,115,22,0.25);
+    }
+    input[readonly] {
+      background: #f9fafb;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+    .btn {
+      padding: 11px;
+      border: none;
+      border-radius: 999px;
+      width: 100%;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #f97316;
+      color: #111827;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn span.icon { font-size: 15px; }
+    .btn:hover {
+      background: #ea580c;
+      transform: translateY(-0.5px);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+    }
+    .message {
       font-size: 12px;
       margin-top: 8px;
-      background: #ffffff;
+      display: none;
+    }
+    .message.error { color: #b91c1c; }
+    .message.success { color: #166534; }
+    .product-info {
+      margin-top: 12px;
+      padding: 10px 12px;
       border-radius: 12px;
-      overflow: hidden;
+      background: #f9fafb;
+      font-size: 12px;
+      color: #374151;
     }
-    th, td {
-      padding: 8px 10px;
+    .product-info b { color: #111827; }
+    .hidden { display: none !important; }
+    .success-page { text-align: center; }
+    .success-icon {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+    .success-details {
       text-align: left;
-    }
-    th {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      background: #f3f4f6;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    td {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #f9fafb;
+      border-radius: 12px;
       font-size: 12px;
-      color: #111827;
-      border-bottom: 1px solid #e5e7eb;
+      color: #374151;
     }
-    tr:last-child td { border-bottom: none; }
-    tr:nth-child(even) td { background: #f9fafb; }
-    tr:nth-child(odd)  td { background: #ffffff; }
-
-    .no-data {
-      text-align: center;
-      padding: 18px 0;
-      font-size: 13px;
-      color: #6b7280;
-    }
-
-    .error-box {
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: #fee2e2;
-      color: #b91c1c;
-      font-size: 12px;
-      margin-bottom: 10px;
-      display: none;
-    }
-
-    .loading {
-      text-align: center;
-      font-size: 13px;
-      color: #6b7280;
-      padding: 12px 0;
-      display: none;
-    }
-    .loading .spinner {
-      width: 18px;
-      height: 18px;
+    .success-details b { color: #111827; }
+    .loader-inline {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       border: 2px solid rgba(148,163,184,0.5);
       border-top-color: #f97316;
       animation: spin 1s linear infinite;
-      margin: 0 auto 10px;
+      margin-right: 6px;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
     .footer {
-      margin-top: 12px;
-      text-align: center;
+      margin-top: 10px;
       font-size: 11px;
-      color: #6b7280;
+      text-align: center;
+      color: #64748b;
     }
   </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Registration Dashboard</h1>
-    <div class="subtitle">Overview of Inpod Fans warranty registrations.</div>
-
-    <div id="error-box" class="error-box"></div>
-
-    <div class="card">
-      <div class="card-header">
-        <div class="section-title">
-          <span class="icon">📊</span>
-          <span>Summary</span>
-        </div>
-        <div class="pill">
-          <span class="dot"></span>
-          <span id="summary-text">Loading...</span>
-        </div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Total Registered</div>
-          <div class="stat-value" id="stat-total">0</div>
-          <div class="stat-sub">All time</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Today</div>
-          <div class="stat-value" id="stat-today">0</div>
-          <div class="stat-sub" id="stat-today-date"></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Last 7 days</div>
-          <div class="stat-value" id="stat-7days">0</div>
-          <div class="stat-sub">Recent trend</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Last 30 days</div>
-          <div class="stat-value" id="stat-30days">0</div>
-          <div class="stat-sub">Monthly activity</div>
-        </div>
-      </div>
-
-      <div id="loading" class="loading">
-        <div class="spinner"></div>
-        Loading stats...
-      </div>
-
-      <h3 style="font-size:14px;margin-top:12px;margin-bottom:4px;">Registrations by Dealer</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Dealer</th>
-            <th>Registered Count</th>
-          </tr>
-        </thead>
-        <tbody id="dealer-body">
-          <tr><td colspan="2" class="no-data">No data.</td></tr>
-        </tbody>
-      </table>
-
-      <h3 style="font-size:14px;margin-top:12px;margin-bottom:4px;">Registrations by Day</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Registrations</th>
-          </tr>
-        </thead>
-        <tbody id="day-body">
-          <tr><td colspan="2" class="no-data">No registrations yet.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="footer">
-      Inpod Fans · Internal registration dashboard
-    </div>
-  </div>
 
   <script>
-    // 🔧 TODO: replace with your deployed Apps Script Web App URL (/exec)
+    // 🔧 TODO: replace with your deployed Apps Script URL (/exec)
     const API_BASE =
       "https://script.google.com/macros/s/AKfycbyhC7ivoWvPm1hYo2VDr9mheEMBkmVFHrIHsxYpDNDH0KNkVNRvBN2DENMW4uWriymr/exec";
 
-    function loadAdminStats() {
-      const errorBox   = document.getElementById('error-box');
-      const loading    = document.getElementById('loading');
-      const dealerBody = document.getElementById('dealer-body');
-      const dayBody    = document.getElementById('day-body');
+    let registrationFormData = null;
+    let currentLang = 'en';
 
-      const statTotal   = document.getElementById('stat-total');
-      const statToday   = document.getElementById('stat-today');
-      const stat7       = document.getElementById('stat-7days');
-      const stat30      = document.getElementById('stat-30days');
-      const statTodayDt = document.getElementById('stat-today-date');
-      const summaryText = document.getElementById('summary-text');
+    // MSG91 widget configuration – fill with your real values
+    const MSG91_WIDGET_ID = "356c6a614a59393139323835";
+    const MSG91_TOKEN_AUTH = "479874Tz6YZockSUbu69273d6bP1";
 
-      errorBox.style.display = 'none';
-      errorBox.textContent = '';
-      loading.style.display = 'block';
-      dealerBody.innerHTML = '';
-      dayBody.innerHTML = '';
+    // 🔧 Set to false in production to enable OTP verification
+    const DEV_MODE = true;
 
-      fetch(`${API_BASE}?admin=1`)
-        .then(r => r.json())
-        .then(data => {
-          loading.style.display = 'none';
+    // i18n
+    const T = {
+      en: {
+        title: "Product Registration",
+        dealer: "Dealer Name",
+        dealerOther: "Other Dealer Name",
+        customer: "Customer Name",
+        purchase: "Purchase Date",
+        phone: "Mobile Number",
+        email: "Email Address",
+        verifyBtn: "Verify OTP & Register",
+        loadingProduct: "Loading product...",
+        errorNoSN: "Missing serial number.",
+        errorFillAll: "Please fill all required fields.",
+        errorPhone: "Enter a valid 10-digit mobile number.",
+        errorDateLogic: "Purchase date cannot be before the manufacturing date.",
+        otpNotReady: "OTP system not ready. Try again.",
+        otpOpen: "Opening OTP...",
+        submitting: "Submitting...",
+        successTitle: "Registration Successful!",
+        successText: "Your product has been successfully registered.",
+        successSub: "Your warranty certificate PDF has been emailed to you.",
+        langEn: "EN",
+        langHi: "HI",
+        dealerPlaceholder: "Select Dealer"
+      },
+      hi: {
+        title: "उत्पाद पंजीकरण",
+        dealer: "डीलर का नाम",
+        dealerOther: "अन्य डीलर का नाम",
+        customer: "ग्राहक का नाम",
+        purchase: "खरीद की तारीख",
+        phone: "मोबाइल नंबर",
+        email: "ईमेल पता",
+        verifyBtn: "ओटीपी सत्यापित करें व पंजीकरण करें",
+        loadingProduct: "उत्पाद लोड हो रहा है...",
+        errorNoSN: "सीरियल नंबर नहीं मिला।",
+        errorFillAll: "कृपया सभी अनिवार्य जानकारी भरें।",
+        errorPhone: "कृपया मान्य 10-अंकीय मोबाइल नंबर दर्ज करें।",
+        errorDateLogic: "खरीद की तारीख निर्माण तिथि से पहले नहीं हो सकती।",
+        otpNotReady: "ओटीपी सिस्टम तैयार नहीं है, पुनः प्रयास करें।",
+        otpOpen: "ओटीपी खोला जा रहा है...",
+        submitting: "सबमिट किया जा रहा है...",
+        successTitle: "पंजीकरण सफल!",
+        successText: "आपका उत्पाद सफलतापूर्वक पंजीकृत हो गया है।",
+        successSub: "आपका वारंटी प्रमाणपत्र PDF आपके ईमेल पर भेज दिया गया है।",
+        langEn: "EN",
+        langHi: "HI",
+        dealerPlaceholder: "डीलर चुनें"
+      }
+    };
 
-          if (!data.success) {
-            errorBox.textContent = data.msg || 'Failed to load stats.';
-            errorBox.style.display = 'block';
-            return;
-          }
-
-          const t = data.totals || {};
-          statTotal.textContent = t.totalRegistered || 0;
-          statToday.textContent = t.todayRegistered || 0;
-          stat7.textContent     = t.last7Days || 0;
-          stat30.textContent    = t.last30Days || 0;
-
-          const today = new Date();
-          const dd = String(today.getDate()).padStart(2,'0');
-          const mm = String(today.getMonth()+1).padStart(2,'0');
-          const yyyy = today.getFullYear();
-          statTodayDt.textContent = `Today: ${dd}-${mm}-${yyyy}`;
-
-          summaryText.textContent =
-            `${t.totalRegistered || 0} total · ${t.todayRegistered || 0} today`;
-
-          const byDealer = data.byDealer || [];
-          if (!byDealer.length) {
-            dealerBody.innerHTML =
-              '<tr><td colspan="2" class="no-data">No dealer registrations yet.</td></tr>';
-          } else {
-            dealerBody.innerHTML = byDealer.map(d => `
-              <tr>
-                <td>${d.dealer || '-'}</td>
-                <td>${d.count || 0}</td>
-              </tr>
-            `).join('');
-          }
-
-          const byDay = data.byDay || [];
-          if (!byDay.length) {
-            dayBody.innerHTML =
-              '<tr><td colspan="2" class="no-data">No registrations yet.</td></tr>';
-          } else {
-            dayBody.innerHTML = byDay.map(r => `
-              <tr>
-                <td>${r.date || '-'}</td>
-                <td>${r.count || 0}</td>
-              </tr>
-            `).join('');
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          loading.style.display = 'none';
-          errorBox.textContent = 'Error loading stats: ' + err.message;
-          errorBox.style.display = 'block';
-        });
+    function t(key) {
+      return (T[currentLang] && T[currentLang][key]) || T.en[key] || key;
     }
 
-    document.addEventListener('DOMContentLoaded', loadAdminStats);
+    function updateLangUI() {
+      document.getElementById("title-text").textContent = t('title');
+      document.querySelector("label[for='dealer-select']").textContent        = t('dealer') + " *";
+      document.querySelector("label[for='dealer-other-input']").textContent   = t('dealerOther') + " *";
+      document.querySelector("label[for='customer-input']").textContent       = t('customer') + " *";
+      document.querySelector("label[for='purchase-input']").textContent       = t('purchase') + " *";
+      document.querySelector("label[for='phone-input']").textContent          = t('phone') + " *";
+      document.querySelector("label[for='email-input']").textContent          = t('email');
+      document.getElementById("verify-btn-text").textContent                  = t('verifyBtn');
+      document.getElementById("lang-en").textContent                          = t('langEn');
+      document.getElementById("lang-hi").textContent                          = t('langHi');
+      const dealerSelect = document.getElementById("dealer-select");
+      if (dealerSelect && dealerSelect.options[0]) {
+        dealerSelect.options[0].textContent = t('dealerPlaceholder');
+      }
+    }
+
+    function showError(msg) {
+      const m = document.getElementById("status-message");
+      m.textContent = msg;
+      m.classList.remove("success");
+      m.classList.add("error");
+      m.style.display = "block";
+    }
+
+    function hideMessages() {
+      const m = document.getElementById("status-message");
+      m.style.display = "none";
+      m.textContent = "";
+    }
+
+    function parseDateFlexible(str) {
+      if (!str) return null;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        const [y, m, d] = str.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+      if (/^\d{2}[-/]\d{2}[-/]\d{4}$/.test(str)) {
+        const parts = str.split(/[-/]/).map(Number);
+        const [d, m, y] = parts;
+        return new Date(y, m - 1, d);
+      }
+      const dt = new Date(str);
+      return isNaN(dt.getTime()) ? null : dt;
+    }
+
+    async function loadDealers() {
+      const select = document.getElementById("dealer-select");
+      const dealerSelectGroup = document.getElementById("dealer-select-group");
+      const dealerOtherGroup  = document.getElementById("dealer-other-group");
+
+      try {
+        const res = await fetch(`${API_BASE}?dealers=1`);
+        const data = await res.json();
+        if (!data.success || !Array.isArray(data.dealers) || !data.dealers.length) {
+          dealerSelectGroup.classList.add("hidden");
+          dealerOtherGroup.classList.remove("hidden");
+          return;
+        }
+
+        select.innerHTML = "";
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = t('dealerPlaceholder');
+        select.appendChild(placeholder);
+
+        data.dealers.forEach(d => {
+          const opt = document.createElement("option");
+          opt.value = d;
+          opt.textContent = d;
+          select.appendChild(opt);
+        });
+
+        const otherOpt = document.createElement("option");
+        otherOpt.value = "OTHER";
+        otherOpt.textContent = "Other";
+        select.appendChild(otherOpt);
+
+        dealerSelectGroup.classList.remove("hidden");
+        dealerOtherGroup.classList.add("hidden");
+
+        select.addEventListener("change", () => {
+          if (select.value === "OTHER") {
+            dealerOtherGroup.classList.remove("hidden");
+          } else {
+            dealerOtherGroup.classList.add("hidden");
+          }
+        });
+      } catch (e) {
+        console.error("Error loading dealers:", e);
+        dealerSelectGroup.classList.add("hidden");
+        dealerOtherGroup.classList.remove("hidden");
+      }
+    }
+
+    async function loadProduct(sn) {
+      const loader = document.getElementById("product-loader");
+      loader.textContent = t('loadingProduct');
+      loader.classList.remove("hidden");
+      document.getElementById("error-state").classList.add("hidden");
+
+      try {
+        const res = await fetch(`${API_BASE}?sn=${encodeURIComponent(sn)}`);
+        const data = await res.json();
+        loader.classList.add("hidden");
+
+        if (data.success && data.product) {
+          window.currentSerialNo = sn;
+          const p = data.product;
+          window.manufacturingDateRaw = p.manufacturingDate || "";
+
+          document.getElementById("product-info").innerHTML = `
+            <div><b>Serial No.:</b> ${p.serialNo || '-'}</div>
+            <div><b>Model Name:</b> ${p.modelName || '-'}</div>
+            <div><b>Manufacturing Date:</b> ${p.manufacturingDate || '-'}</div>
+          `;
+          document.getElementById("main-content").classList.remove("hidden");
+        } else {
+          document.getElementById("error-state").classList.remove("hidden");
+          document.getElementById("error-message").textContent = data.msg || "Product not found.";
+        }
+      } catch (e) {
+        console.error("Error loading product:", e);
+        loader.classList.add("hidden");
+        document.getElementById("error-state").classList.remove("hidden");
+        document.getElementById("error-message").textContent = "Error loading product.";
+      }
+    }
+
+    function renderSuccessView(resData) {
+      const mainCard = document.getElementById("main-card");
+      const r = resData || {};
+      mainCard.innerHTML = `
+        <div class="container">
+          <div class="top-bar">
+            <div class="logo-wrapper">
+              <img src="https://inpodfans.com/images/logo/logo.svg" alt="Inpod Fans Logo">
+            </div>
+          </div>
+          <div class="card success-page">
+            <div class="success-icon">✅</div>
+            <h2>${t('successTitle')}</h2>
+            <p style="color:#6b7280;margin-bottom:4px;">
+              ${t('successText')}
+            </p>
+            <p style="color:#16a34a;font-size:13px;margin-bottom:14px;">
+              ${t('successSub')}
+            </p>
+            <div class="success-details">
+              <div><b>Serial No.:</b> ${r.sn || '-'}</div>
+              <div><b>Model:</b> ${r.model || '-'}</div>
+              <div><b>Purchase Date:</b> ${r.purchaseDDMMYYYY || '-'}</div>
+              <div><b>Warranty Ends On:</b> ${r.warrantyExpiryDDMMYYYY || '-'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function submitRegistration(otpToken) {
+      if (!registrationFormData) return;
+      hideMessages();
+
+      const btn = document.getElementById("verify-btn");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="loader-inline"></span>${t('submitting')}`;
+
+      const payload = {
+        action: "saveRegistration",
+        data: Object.assign({}, registrationFormData, { otp_token: otpToken })
+      };
+
+      try {
+        const res = await fetch(API_BASE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          renderSuccessView(data);
+        } else {
+          showError(data.msg || "Registration failed.");
+          btn.disabled = false;
+          btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+        }
+      } catch (e) {
+        console.error("Submit error:", e);
+        showError("Error submitting registration.");
+        btn.disabled = false;
+        btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+      }
+    }
+
+    // MSG91 widget configuration object
+    const widgetConfig = {
+      widgetId: MSG91_WIDGET_ID,
+      tokenAuth: MSG91_TOKEN_AUTH,
+      identifier: "", // will set to "91" + phone
+      exposeMethods: false,
+      success: function (data) {
+        console.log("MSG91 success:", data);
+
+        const accessToken =
+          data.accessToken ||
+          data["access-token"] ||
+          data.token ||
+          (data.response &&
+            (data.response.accessToken ||
+             data.response["access-token"] ||
+             data.response.token)) ||
+          data.message;
+
+        if (!accessToken) {
+          showError("Could not read OTP token.");
+          const btn = document.getElementById("verify-btn");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+          }
+          return;
+        }
+
+        submitRegistration(accessToken);
+      },
+      failure: function (err) {
+        console.log("MSG91 failure:", err);
+        showError("OTP verification failed.");
+        const btn = document.getElementById("verify-btn");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+        }
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sn = urlParams.get("sn") || "";
+
+      const serialInput = document.getElementById("serial-input");
+      serialInput.value = sn || "";
+      serialInput.readOnly = !!sn;
+
+      if (!sn) {
+        document.getElementById("main-content").classList.add("hidden");
+        document.getElementById("error-state").classList.remove("hidden");
+        document.getElementById("error-message").textContent = t('errorNoSN');
+      } else {
+        serialInput.classList.add("readonly");
+        loadProduct(sn);
+      }
+
+      document.getElementById("lang-en").addEventListener("click", () => {
+        currentLang = 'en';
+        document.getElementById("lang-en").classList.add("active");
+        document.getElementById("lang-hi").classList.remove("active");
+        updateLangUI();
+      });
+      document.getElementById("lang-hi").addEventListener("click", () => {
+        currentLang = 'hi';
+        document.getElementById("lang-hi").classList.add("active");
+        document.getElementById("lang-en").classList.remove("active");
+        updateLangUI();
+      });
+      updateLangUI();
+
+      loadDealers();
+
+      document.getElementById("verify-btn").addEventListener("click", () => {
+        const sn = window.currentSerialNo;
+
+        const dealerSelectGroup = document.getElementById("dealer-select-group");
+        const dealerSelect      = document.getElementById("dealer-select");
+        const dealerOtherGroup  = document.getElementById("dealer-other-group");
+        const dealerOtherInput  = document.getElementById("dealer-other-input");
+
+        let dealer = "";
+        if (!dealerSelectGroup.classList.contains("hidden") && dealerSelect) {
+          dealer = dealerSelect.value;
+          if (dealer === "OTHER") {
+            dealer = dealerOtherInput.value.trim();
+          }
+        } else {
+          dealer = dealerOtherInput.value.trim();
+        }
+
+        const customer = document.getElementById("customer-input").value.trim();
+        const purchase = document.getElementById("purchase-input").value.trim();
+        let phone      = document.getElementById("phone-input").value.trim();
+        const email    = document.getElementById("email-input").value.trim();
+
+        if (!sn || !dealer || !customer || !purchase || !phone) {
+          showError(t('errorFillAll'));
+          return;
+        }
+
+        const mfgRaw = window.manufacturingDateRaw || "";
+        const mfgDate = parseDateFlexible(mfgRaw);
+        const purchaseDate = parseDateFlexible(purchase);
+
+        if (mfgDate && purchaseDate && purchaseDate < mfgDate) {
+          showError(t('errorDateLogic'));
+          return;
+        }
+
+        phone = phone.replace(/\D/g, "");
+        if (phone.length !== 10) {
+          showError(t('errorPhone'));
+          return;
+        }
+
+        registrationFormData = {
+          sn,
+          dealer,
+          customer,
+          purchase,
+          phone,
+          email,
+          lang: currentLang
+        };
+
+        hideMessages();
+        const btn = document.getElementById("verify-btn");
+        btn.disabled = true;
+        btn.innerHTML = `<span class="loader-inline"></span>${t('otpOpen')}`;
+
+        // DEV MODE: skip OTP verification
+        if (DEV_MODE) {
+          console.log("DEV_MODE enabled - skipping OTP verification");
+          submitRegistration("DEV_FAKE_TOKEN");
+          return;
+        }
+
+        // PRODUCTION: Use MSG91 OTP widget
+        try {
+          widgetConfig.identifier = "91" + phone;
+          if (typeof initSendOTP === 'function') {
+            initSendOTP(widgetConfig);
+          } else {
+            throw new Error("MSG91 script not loaded");
+          }
+        } catch (e) {
+          console.error("OTP widget error:", e);
+          showError(t('otpNotReady'));
+          btn.disabled = false;
+          btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+        }
+      });
+    });
+
+    // Load MSG91 OTP script (only if not in DEV mode)
+    if (!DEV_MODE) {
+      (function loadOtpScript(urls) {
+        let i = 0;
+        function attempt() {
+          let s = document.createElement("script");
+          s.src = urls[i];
+          s.async = true;
+          s.onload  = () => console.log("Loaded:", urls[i]);
+          s.onerror = () => { i++; if (i < urls.length) attempt(); };
+          document.head.appendChild(s);
+        }
+        attempt();
+      })([
+        "https://verify.msg91.com/otp-provider.js",
+        "https://verify.phone91.com/otp-provider.js"
+      ]);
+    }
   </script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <div class="logo-wrapper">
+        <img src="https://inpodfans.com/images/logo/logo.svg" alt="Inpod Fans Logo">
+      </div>
+      <div class="lang-switch">
+        <button id="lang-en" class="lang-btn active">EN</button>
+        <button id="lang-hi" class="lang-btn">HI</button>
+      </div>
+    </div>
+
+    <div id="main-card" class="card">
+      <div class="card-header">
+        <h1>
+          <span class="icon">🧾</span>
+          <span id="title-text">Product Registration</span>
+        </h1>
+        <p>Register your Inpod Fans product and get your warranty certificate by email.</p>
+        <div class="pill">
+          <span class="dot"></span>
+          <span>Step 1: Confirm product · Step 2: Verify OTP · Step 3: Check your email</span>
+        </div>
+      </div>
+
+      <div id="error-state" class="hidden">
+        <p id="error-message" style="color:#b91c1c;font-size:13px;"></p>
+      </div>
+
+      <div id="main-content" class="hidden">
+        <div class="product-info" id="product-info"></div>
+
+        <div id="product-loader" class="message" style="margin-top:6px;font-size:12px;"></div>
+
+        <div class="form-grid" style="margin-top:14px;">
+          <div class="full-width">
+            <label for="serial-input">Serial Number *</label>
+            <input id="serial-input" placeholder="Serial number" />
+          </div>
+
+          <div id="dealer-select-group">
+            <label for="dealer-select">Dealer Name *</label>
+            <select id="dealer-select">
+              <option value="">Select Dealer</option>
+            </select>
+          </div>
+
+          <div id="dealer-other-group" class="hidden">
+            <label for="dealer-other-input">Other Dealer Name *</label>
+            <input id="dealer-other-input" placeholder="Enter dealer name" />
+          </div>
+
+          <div>
+            <label for="customer-input">Customer Name *</label>
+            <input id="customer-input" placeholder="Enter customer name" />
+          </div>
+
+          <div>
+            <label for="purchase-input">Purchase Date *</label>
+            <input id="purchase-input" type="date" />
+          </div>
+
+          <div>
+            <label for="phone-input">Mobile Number *</label>
+            <input id="phone-input" placeholder="10-digit mobile number" />
+          </div>
+
+          <div>
+            <label for="email-input">Email Address</label>
+            <input id="email-input" type="email" placeholder="name@example.com" />
+          </div>
+        </div>
+
+        <div style="margin-top:14px;">
+          <button id="verify-btn" class="btn">
+            <span class="icon">🔒</span>
+            <span id="verify-btn-text">Verify OTP &amp; Register</span>
+          </button>
+        </div>
+
+        <div id="status-message" class="message"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Inpod Fans · Product registration &amp; warranty
+    </div>
+  </div>
 </body>
 </html>
