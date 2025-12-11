@@ -219,14 +219,18 @@
   </style>
 
   <script>
-    // TODO: replace with your deployed Apps Script Web App URL (/exec)
+    // 🔧 TODO: replace with your deployed Apps Script URL (/exec)
     const API_BASE =
-      "https://script.google.com/macros/s/AKfycbyhC7ivoWvPm1hYo2VDr9mheEMBkmVFHrIHsxYpDNDH0KNkVNRvBN2DENMW4uWriymr/exec";
+      "https://script.google.com/macros/s/REPLACE_WITH_YOUR_EXEC_URL/exec";
 
     let registrationFormData = null;
     let currentLang = 'en';
-    let configuration = null;
 
+    // MSG91 widget configuration – fill with your real values
+    const MSG91_WIDGET_ID = "WIDGET_ID_FROM_MSG91";
+    const MSG91_TOKEN_AUTH = "TOKEN_AUTH_FROM_MSG91";
+
+    // i18n
     const T = {
       en: {
         title: "Product Registration",
@@ -299,48 +303,6 @@
       }
     }
 
-    // MSG91 Widget configuration (default UI)
-var configuration = {
-  widgetId:  "356c6a614a59393139323835",  // your widget ID
-  tokenAuth: "479874Tz6YZockSUbu69273d6bP1", // your token_auth from MSG91
-  identifier: "",                           // will be "91" + phone
-  exposeMethods: false,                     // MSG91 default UI handles OTP screen
-
-  success: function (data) {
-    console.log("MSG91 success:", data);
-
-    var accessToken =
-      data.accessToken ||
-      data["access-token"] ||
-      data.token ||
-      (data.response &&
-        (data.response.accessToken ||
-         data.response["access-token"] ||
-         data.response.token)) ||
-      data.message;
-
-    if (!accessToken) {
-      showError("Could not read OTP token.");
-      const btn = document.getElementById("verify-btn");
-      btn.disabled = false;
-      btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
-      return;
-    }
-
-    // 🔁 Now pass this token to backend
-    submitRegistration(accessToken);
-  },
-
-  failure: function (error) {
-    console.log("MSG91 failure:", error);
-    showError("OTP verification failed.");
-    const btn = document.getElementById("verify-btn");
-    btn.disabled = false;
-    btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
-  }
-};
-
-
     function showError(msg) {
       const m = document.getElementById("status-message");
       m.textContent = msg;
@@ -355,16 +317,19 @@ var configuration = {
       m.textContent = "";
     }
 
-    function buildOtpConfiguration() {
-      configuration = {
-        widgetId: 'OTP_WIDGET',
-        identifier: '',
-        sdkType: 'external',
-        userLocale: 'en',
-        flowType: 'OTP',
-        mode: 'LIVE',
-        countryCode: '91'
-      };
+    function parseDateFlexible(str) {
+      if (!str) return null;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        const [y, m, d] = str.split('-').map(Number);
+        return new Date(y, m - 1, d);
+      }
+      if (/^\d{2}[-/]\d{2}[-/]\d{4}$/.test(str)) {
+        const parts = str.split(/[-/]/).map(Number);
+        const [d, m, y] = parts;
+        return new Date(y, m - 1, d);
+      }
+      const dt = new Date(str);
+      return isNaN(dt.getTime()) ? null : dt;
     }
 
     async function loadDealers() {
@@ -413,21 +378,6 @@ var configuration = {
         dealerSelectGroup.classList.add("hidden");
         dealerOtherGroup.classList.remove("hidden");
       }
-    }
-
-    function parseDateFlexible(str) {
-      if (!str) return null;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
-        const [y, m, d] = str.split('-').map(Number);
-        return new Date(y, m - 1, d);
-      }
-      if (/^\d{2}[-/]\d{2}[-/]\d{4}$/.test(str)) {
-        const parts = str.split(/[-/]/).map(Number);
-        const [d, m, y] = parts;
-        return new Date(y, m - 1, d);
-      }
-      const dt = new Date(str);
-      return isNaN(dt.getTime()) ? null : dt;
     }
 
     async function loadProduct(sn) {
@@ -523,10 +473,56 @@ var configuration = {
         console.error(e);
         showError("Error submitting registration.");
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+        // button UI will usually be reset by success view, but keep this for error case
+        const b = document.getElementById("verify-btn");
+        if (b) {
+          b.disabled = false;
+          b.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+        }
       }
     }
+
+    // MSG91 widget configuration object
+    const widgetConfig = {
+      widgetId: MSG91_WIDGET_ID,
+      tokenAuth: MSG91_TOKEN_AUTH,
+      identifier: "", // will set to "91" + phone
+      exposeMethods: false,
+      success: function (data) {
+        console.log("MSG91 success:", data);
+
+        const accessToken =
+          data.accessToken ||
+          data["access-token"] ||
+          data.token ||
+          (data.response &&
+            (data.response.accessToken ||
+             data.response["access-token"] ||
+             data.response.token)) ||
+          data.message;
+
+        if (!accessToken) {
+          showError("Could not read OTP token.");
+          const btn = document.getElementById("verify-btn");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+          }
+          return;
+        }
+
+        submitRegistration(accessToken);
+      },
+      failure: function (err) {
+        console.log("MSG91 failure:", err);
+        showError("OTP verification failed.");
+        const btn = document.getElementById("verify-btn");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+        }
+      }
+    };
 
     document.addEventListener("DOMContentLoaded", () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -559,7 +555,6 @@ var configuration = {
       });
       updateLangUI();
 
-      buildOtpConfiguration();
       loadDealers();
 
       document.getElementById("verify-btn").addEventListener("click", () => {
@@ -600,12 +595,7 @@ var configuration = {
         }
 
         phone = phone.replace(/\D/g, "");
-        if (phone.length === 10) {
-          configuration.identifier = "91" + phone;
-        } else if (phone.length === 12 && phone.startsWith("91")) {
-          configuration.identifier = phone;
-          phone = phone.slice(-10);
-        } else {
+        if (phone.length !== 10) {
           showError(t('errorPhone'));
           return;
         }
@@ -625,25 +615,29 @@ var configuration = {
         btn.disabled = true;
         btn.innerHTML = `<span class="loader-inline"></span>${t('otpOpen')}`;
 
-        if (!window.OTPV2 || !window.OTPV2.showOTP) {
+        // set identifier for MSG91 widget
+        widgetConfig.identifier = "91" + phone;
+
+        try {
+          if (window.OTP && typeof window.OTP.init === "function") {
+            window.OTP.init(widgetConfig);
+          } else if (window.OTPV2 && typeof window.OTPV2.init === "function") {
+            window.OTPV2.init(widgetConfig);
+          } else {
+            showError(t('otpNotReady'));
+            btn.disabled = false;
+            btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+          }
+        } catch (e) {
+          console.error(e);
           showError(t('otpNotReady'));
           btn.disabled = false;
           btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
-          return;
         }
-
-        window.OTPV2.showOTP(configuration, async function (res) {
-          if (res && res.status === "VERIFIED" && res.token) {
-            await submitRegistration(res.token);
-          } else {
-            showError("OTP verification failed or cancelled.");
-          }
-          btn.disabled = false;
-          btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
-        });
       });
     });
 
+    // Load MSG91 OTP script
     (function loadOtpScript(urls) {
       let i = 0;
       function attempt() {
