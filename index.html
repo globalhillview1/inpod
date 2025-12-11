@@ -616,19 +616,13 @@
         btn.innerHTML = `<span class="loader-inline"></span>${t('otpOpen')}`;
 
         // set identifier for MSG91 widget
-        widgetConfig.identifier = "91" + phone;
+hideMessages();
+const btn = document.getElementById("verify-btn");
+btn.disabled = true;
+btn.innerHTML = `<span class="loader-inline"></span>${t('otpOpen')}`;
 
-        try {
-          if (window.OTP && typeof window.OTP.init === "function") {
-            window.OTP.init(widgetConfig);
-          } else if (window.OTPV2 && typeof window.OTPV2.init === "function") {
-            window.OTPV2.init(widgetConfig);
-          } else {
-            showError(t('otpNotReady'));
-            btn.disabled = false;
-            btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
-          }
-        } catch (e) {
+// DEV: bypass MSG91, just send fake token
+submitRegistration("DEV_FAKE_TOKEN");
           console.error(e);
           showError(t('otpNotReady'));
           btn.disabled = false;
