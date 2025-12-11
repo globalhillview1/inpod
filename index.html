@@ -299,6 +299,48 @@
       }
     }
 
+    // MSG91 Widget configuration (default UI)
+var configuration = {
+  widgetId:  "356c6a614a59393139323835",  // your widget ID
+  tokenAuth: "479874Tz6YZockSUbu69273d6bP1", // your token_auth from MSG91
+  identifier: "",                           // will be "91" + phone
+  exposeMethods: false,                     // MSG91 default UI handles OTP screen
+
+  success: function (data) {
+    console.log("MSG91 success:", data);
+
+    var accessToken =
+      data.accessToken ||
+      data["access-token"] ||
+      data.token ||
+      (data.response &&
+        (data.response.accessToken ||
+         data.response["access-token"] ||
+         data.response.token)) ||
+      data.message;
+
+    if (!accessToken) {
+      showError("Could not read OTP token.");
+      const btn = document.getElementById("verify-btn");
+      btn.disabled = false;
+      btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+      return;
+    }
+
+    // 🔁 Now pass this token to backend
+    submitRegistration(accessToken);
+  },
+
+  failure: function (error) {
+    console.log("MSG91 failure:", error);
+    showError("OTP verification failed.");
+    const btn = document.getElementById("verify-btn");
+    btn.disabled = false;
+    btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+  }
+};
+
+
     function showError(msg) {
       const m = document.getElementById("status-message");
       m.textContent = msg;
