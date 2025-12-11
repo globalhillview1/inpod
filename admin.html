@@ -86,7 +86,7 @@
     }
     .card-header p {
       font-size: 13px;
-      color: var(--text-muted);
+      color: #64748b;
     }
     .pill {
       font-size: 11px;
@@ -219,13 +219,14 @@
   </style>
 
   <script>
-    // 🔧 REPLACE with your deployed Apps Script Web App URL (/exec)
+    // your deployed Apps Script URL (/exec)
     const API_BASE =
-      "https://script.google.com/macros/s/REPLACE_WITH_YOUR_EXEC_URL/exec";
+      "https://script.google.com/macros/s/AKfycbyhC7ivoWvPm1hYo2VDr9mheEMBkmVFHrIHsxYpDNDH0KNkVNRvBN2DENMW4uWriymr/exec";
 
     let registrationFormData = null;
     let currentLang = 'en';
 
+    // i18n
     const T = {
       en: {
         title: "Product Registration",
@@ -235,7 +236,7 @@
         purchase: "Purchase Date",
         phone: "Mobile Number",
         email: "Email Address",
-        verifyBtn: "Verify & Register",
+        verifyBtn: "Verify OTP & Register",
         loadingProduct: "Loading product...",
         errorNoSN: "Missing serial number.",
         errorFillAll: "Please fill all required fields.",
@@ -257,7 +258,7 @@
         purchase: "खरीद की तारीख",
         phone: "मोबाइल नंबर",
         email: "ईमेल पता",
-        verifyBtn: "सत्यापित करें व पंजीकरण करें",
+        verifyBtn: "ओटीपी सत्यापित करें व पंजीकरण करें",
         loadingProduct: "उत्पाद लोड हो रहा है...",
         errorNoSN: "सीरियल नंबर नहीं मिला।",
         errorFillAll: "कृपया सभी अनिवार्य जानकारी भरें।",
@@ -279,15 +280,15 @@
 
     function updateLangUI() {
       document.getElementById("title-text").textContent = t('title');
-      document.querySelector("label[for='dealer-select']").textContent        = t('dealer') + " *";
-      document.querySelector("label[for='dealer-other-input']").textContent   = t('dealerOther') + " *";
-      document.querySelector("label[for='customer-input']").textContent       = t('customer') + " *";
-      document.querySelector("label[for='purchase-input']").textContent       = t('purchase') + " *";
-      document.querySelector("label[for='phone-input']").textContent          = t('phone') + " *";
-      document.querySelector("label[for='email-input']").textContent          = t('email');
-      document.getElementById("verify-btn-text").textContent                  = t('verifyBtn');
-      document.getElementById("lang-en").textContent                          = t('langEn');
-      document.getElementById("lang-hi").textContent                          = t('langHi');
+      document.querySelector("label[for='dealer-select']").textContent      = t('dealer') + " *";
+      document.querySelector("label[for='dealer-other-input']").textContent = t('dealerOther') + " *";
+      document.querySelector("label[for='customer-input']").textContent     = t('customer') + " *";
+      document.querySelector("label[for='purchase-input']").textContent     = t('purchase') + " *";
+      document.querySelector("label[for='phone-input']").textContent        = t('phone') + " *";
+      document.querySelector("label[for='email-input']").textContent        = t('email');
+      document.getElementById("verify-btn-text").textContent                = t('verifyBtn');
+      document.getElementById("lang-en").textContent                        = t('langEn');
+      document.getElementById("lang-hi").textContent                        = t('langHi');
       const dealerSelect = document.getElementById("dealer-select");
       if (dealerSelect && dealerSelect.options[0]) {
         dealerSelect.options[0].textContent = t('dealerPlaceholder');
@@ -485,7 +486,6 @@
         document.getElementById("error-state").classList.remove("hidden");
         document.getElementById("error-message").textContent = t('errorNoSN');
       } else {
-        serialInput.classList.add("readonly");
         loadProduct(sn);
       }
 
@@ -559,11 +559,8 @@
         };
 
         hideMessages();
-        const btn = document.getElementById("verify-btn");
-        btn.disabled = true;
-        btn.innerHTML = `<span class="loader-inline"></span>${t('submitting')}`;
 
-        // DEV MODE: bypass MSG91, send dummy token – matches DEV_SKIP_OTP = true in Code.gs
+        // DEV MODE: bypass MSG91, send fake token – backend skips OTP because DEV_SKIP_OTP = true
         submitRegistration("DEV_FAKE_TOKEN");
       });
     });
@@ -591,7 +588,7 @@
         <p>Register your Inpod Fans product and get your warranty certificate by email.</p>
         <div class="pill">
           <span class="dot"></span>
-          <span>Step 1: Confirm product · Step 2: Verify · Step 3: Check your email</span>
+          <span>Step 1: Confirm product · Step 2: Verify OTP · Step 3: Check your email</span>
         </div>
       </div>
 
@@ -646,7 +643,7 @@
         <div style="margin-top:14px;">
           <button id="verify-btn" class="btn">
             <span class="icon">🔒</span>
-            <span id="verify-btn-text">Verify &amp; Register</span>
+            <span id="verify-btn-text">Verify OTP &amp; Register</span>
           </button>
         </div>
 
