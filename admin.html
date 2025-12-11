@@ -219,21 +219,13 @@
   </style>
 
   <script>
-    // 🔧 TODO: replace with your deployed Apps Script URL (/exec)
+    // 🔧 REPLACE with your deployed Apps Script Web App URL (/exec)
     const API_BASE =
-      "https://script.google.com/macros/s/AKfycbyhC7ivoWvPm1hYo2VDr9mheEMBkmVFHrIHsxYpDNDH0KNkVNRvBN2DENMW4uWriymr/exec";
+      "https://script.google.com/macros/s/REPLACE_WITH_YOUR_EXEC_URL/exec";
 
     let registrationFormData = null;
     let currentLang = 'en';
 
-    // MSG91 widget configuration – fill with your real values
-    const MSG91_WIDGET_ID = "356c6a614a59393139323835";
-    const MSG91_TOKEN_AUTH = "479874Tz6YZockSUbu69273d6bP1";
-
-    // 🔧 Set to false in production to enable OTP verification
-    const DEV_MODE = true;
-
-    // i18n
     const T = {
       en: {
         title: "Product Registration",
@@ -243,14 +235,12 @@
         purchase: "Purchase Date",
         phone: "Mobile Number",
         email: "Email Address",
-        verifyBtn: "Verify OTP & Register",
+        verifyBtn: "Verify & Register",
         loadingProduct: "Loading product...",
         errorNoSN: "Missing serial number.",
         errorFillAll: "Please fill all required fields.",
         errorPhone: "Enter a valid 10-digit mobile number.",
         errorDateLogic: "Purchase date cannot be before the manufacturing date.",
-        otpNotReady: "OTP system not ready. Try again.",
-        otpOpen: "Opening OTP...",
         submitting: "Submitting...",
         successTitle: "Registration Successful!",
         successText: "Your product has been successfully registered.",
@@ -267,14 +257,12 @@
         purchase: "खरीद की तारीख",
         phone: "मोबाइल नंबर",
         email: "ईमेल पता",
-        verifyBtn: "ओटीपी सत्यापित करें व पंजीकरण करें",
+        verifyBtn: "सत्यापित करें व पंजीकरण करें",
         loadingProduct: "उत्पाद लोड हो रहा है...",
         errorNoSN: "सीरियल नंबर नहीं मिला।",
         errorFillAll: "कृपया सभी अनिवार्य जानकारी भरें।",
         errorPhone: "कृपया मान्य 10-अंकीय मोबाइल नंबर दर्ज करें।",
         errorDateLogic: "खरीद की तारीख निर्माण तिथि से पहले नहीं हो सकती।",
-        otpNotReady: "ओटीपी सिस्टम तैयार नहीं है, पुनः प्रयास करें।",
-        otpOpen: "ओटीपी खोला जा रहा है...",
         submitting: "सबमिट किया जा रहा है...",
         successTitle: "पंजीकरण सफल!",
         successText: "आपका उत्पाद सफलतापूर्वक पंजीकृत हो गया है।",
@@ -378,7 +366,6 @@
           }
         });
       } catch (e) {
-        console.error("Error loading dealers:", e);
         dealerSelectGroup.classList.add("hidden");
         dealerOtherGroup.classList.remove("hidden");
       }
@@ -411,7 +398,6 @@
           document.getElementById("error-message").textContent = data.msg || "Product not found.";
         }
       } catch (e) {
-        console.error("Error loading product:", e);
         loader.classList.add("hidden");
         document.getElementById("error-state").classList.remove("hidden");
         document.getElementById("error-message").textContent = "Error loading product.";
@@ -473,58 +459,18 @@
           renderSuccessView(data);
         } else {
           showError(data.msg || "Registration failed.");
-          btn.disabled = false;
-          btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
         }
       } catch (e) {
-        console.error("Submit error:", e);
+        console.error(e);
         showError("Error submitting registration.");
-        btn.disabled = false;
-        btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+      } finally {
+        const b = document.getElementById("verify-btn");
+        if (b) {
+          b.disabled = false;
+          b.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
+        }
       }
     }
-
-    // MSG91 widget configuration object
-    const widgetConfig = {
-      widgetId: MSG91_WIDGET_ID,
-      tokenAuth: MSG91_TOKEN_AUTH,
-      identifier: "", // will set to "91" + phone
-      exposeMethods: false,
-      success: function (data) {
-        console.log("MSG91 success:", data);
-
-        const accessToken =
-          data.accessToken ||
-          data["access-token"] ||
-          data.token ||
-          (data.response &&
-            (data.response.accessToken ||
-             data.response["access-token"] ||
-             data.response.token)) ||
-          data.message;
-
-        if (!accessToken) {
-          showError("Could not read OTP token.");
-          const btn = document.getElementById("verify-btn");
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
-          }
-          return;
-        }
-
-        submitRegistration(accessToken);
-      },
-      failure: function (err) {
-        console.log("MSG91 failure:", err);
-        showError("OTP verification failed.");
-        const btn = document.getElementById("verify-btn");
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
-        }
-      }
-    };
 
     document.addEventListener("DOMContentLoaded", () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -615,50 +561,12 @@
         hideMessages();
         const btn = document.getElementById("verify-btn");
         btn.disabled = true;
-        btn.innerHTML = `<span class="loader-inline"></span>${t('otpOpen')}`;
+        btn.innerHTML = `<span class="loader-inline"></span>${t('submitting')}`;
 
-        // DEV MODE: skip OTP verification
-        if (DEV_MODE) {
-          console.log("DEV_MODE enabled - skipping OTP verification");
-          submitRegistration("DEV_FAKE_TOKEN");
-          return;
-        }
-
-        // PRODUCTION: Use MSG91 OTP widget
-        try {
-          widgetConfig.identifier = "91" + phone;
-          if (typeof initSendOTP === 'function') {
-            initSendOTP(widgetConfig);
-          } else {
-            throw new Error("MSG91 script not loaded");
-          }
-        } catch (e) {
-          console.error("OTP widget error:", e);
-          showError(t('otpNotReady'));
-          btn.disabled = false;
-          btn.innerHTML = `<span class="icon">🔒</span><span id="verify-btn-text">${t('verifyBtn')}</span>`;
-        }
+        // DEV MODE: bypass MSG91, send dummy token – matches DEV_SKIP_OTP = true in Code.gs
+        submitRegistration("DEV_FAKE_TOKEN");
       });
     });
-
-    // Load MSG91 OTP script (only if not in DEV mode)
-    if (!DEV_MODE) {
-      (function loadOtpScript(urls) {
-        let i = 0;
-        function attempt() {
-          let s = document.createElement("script");
-          s.src = urls[i];
-          s.async = true;
-          s.onload  = () => console.log("Loaded:", urls[i]);
-          s.onerror = () => { i++; if (i < urls.length) attempt(); };
-          document.head.appendChild(s);
-        }
-        attempt();
-      })([
-        "https://verify.msg91.com/otp-provider.js",
-        "https://verify.phone91.com/otp-provider.js"
-      ]);
-    }
   </script>
 </head>
 
@@ -683,7 +591,7 @@
         <p>Register your Inpod Fans product and get your warranty certificate by email.</p>
         <div class="pill">
           <span class="dot"></span>
-          <span>Step 1: Confirm product · Step 2: Verify OTP · Step 3: Check your email</span>
+          <span>Step 1: Confirm product · Step 2: Verify · Step 3: Check your email</span>
         </div>
       </div>
 
@@ -738,7 +646,7 @@
         <div style="margin-top:14px;">
           <button id="verify-btn" class="btn">
             <span class="icon">🔒</span>
-            <span id="verify-btn-text">Verify OTP &amp; Register</span>
+            <span id="verify-btn-text">Verify &amp; Register</span>
           </button>
         </div>
 
