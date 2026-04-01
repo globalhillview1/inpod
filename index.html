@@ -186,8 +186,6 @@
     const T = {
       en: {
         title: "Product Registration",
-        dealer: "Dealer Name",
-        dealerOther: "Other Dealer Name",
         customer: "Customer Name",
         purchase: "Purchase Date",
         phone: "Mobile Number",
@@ -204,13 +202,10 @@
         successText: "Your product has been successfully registered.",
         pdfBtn: "Download Warranty PDF",
         langEn: "EN",
-        langHi: "HI",
-        dealerPlaceholder: "Select Dealer"
+        langHi: "HI"
       },
       hi: {
         title: "उत्पाद पंजीकरण",
-        dealer: "डीलर का नाम",
-        dealerOther: "अन्य डीलर का नाम",
         customer: "ग्राहक का नाम",
         purchase: "खरीद की तारीख",
         phone: "मोबाइल नंबर",
@@ -227,8 +222,7 @@
         successText: "आपका उत्पाद सफलतापूर्वक पंजीकृत हो गया है।",
         pdfBtn: "वारंटी PDF डाउनलोड करें",
         langEn: "EN",
-        langHi: "HI",
-        dealerPlaceholder: "डीलर चुनें"
+        langHi: "HI"
       }
     };
 
@@ -238,8 +232,6 @@
 
     function updateLangUI() {
       document.getElementById("title-text").textContent = t('title');
-      document.querySelector("label[for='dealer-select']").textContent        = t('dealer') + " *";
-      document.querySelector("label[for='dealer-other-input']").textContent   = t('dealerOther') + " *";
       document.querySelector("label[for='customer-input']").textContent       = t('customer') + " *";
       document.querySelector("label[for='purchase-input']").textContent       = t('purchase') + " *";
       document.querySelector("label[for='phone-input']").textContent          = t('phone') + " *";
@@ -248,10 +240,6 @@
       document.getElementById("loading-text").textContent                     = t('loadingProduct');
       document.getElementById("lang-en").textContent                          = T.en.langEn;
       document.getElementById("lang-hi").textContent                          = T.en.langHi;
-      const dealerSelect = document.getElementById("dealer-select");
-      if (dealerSelect && dealerSelect.options[0]) {
-        dealerSelect.options[0].textContent = t('dealerPlaceholder');
-      }
     }
 
     function showError(msg){
@@ -364,59 +352,8 @@
       updateLangUI();
     });
 
-    // Load dealers from backend
-    async function loadDealers() {
-      const select = document.getElementById("dealer-select");
-      const dealerSelectGroup = document.getElementById("dealer-select-group");
-      const dealerOtherGroup  = document.getElementById("dealer-other-group");
-
-      try {
-        const res = await fetch(`${API_BASE}?dealers=1`);
-        const result = await res.json();
-
-        if (!result.success || !Array.isArray(result.dealers) || result.dealers.length === 0) {
-          dealerSelectGroup.classList.add("hidden");
-          dealerOtherGroup.classList.remove("hidden");
-          return;
-        }
-
-        select.innerHTML = "";
-        const placeholder = document.createElement("option");
-        placeholder.value = "";
-        placeholder.textContent = t('dealerPlaceholder');
-        select.appendChild(placeholder);
-
-        result.dealers.forEach(name => {
-          const opt = document.createElement("option");
-          opt.value = name;
-          opt.textContent = name;
-          select.appendChild(opt);
-        });
-
-        const optOther = document.createElement("option");
-        optOther.value = "OTHER";
-        optOther.textContent = "Other";
-        select.appendChild(optOther);
-
-        select.addEventListener("change", () => {
-          if (select.value === "OTHER") {
-            dealerOtherGroup.classList.remove("hidden");
-          } else {
-            dealerOtherGroup.classList.add("hidden");
-          }
-        });
-
-      } catch (e) {
-        console.error("Error loading dealers:", e);
-        dealerSelectGroup.classList.add("hidden");
-        dealerOtherGroup.classList.remove("hidden");
-      }
-    }
-
     // Load product
     document.addEventListener("DOMContentLoaded", async ()=>{
-      await loadDealers();
-
       const sn = getSerial();
       const loader = document.getElementById("loading-state");
       loader.classList.remove("hidden");
@@ -460,27 +397,12 @@
       document.getElementById("verify-btn").addEventListener("click", () => {
         const sn = window.currentSerialNo;
 
-        const dealerSelectGroup = document.getElementById("dealer-select-group");
-        const dealerSelect      = document.getElementById("dealer-select");
-        const dealerOtherGroup  = document.getElementById("dealer-other-group");
-        const dealerOtherInput  = document.getElementById("dealer-other-input");
-
-        let dealer = "";
-        if (!dealerSelectGroup.classList.contains("hidden") && dealerSelect) {
-          dealer = dealerSelect.value;
-          if (dealer === "OTHER") {
-            dealer = dealerOtherInput.value.trim();
-          }
-        } else {
-          dealer = dealerOtherInput.value.trim();
-        }
-
         const customer = document.getElementById("customer-input").value.trim();
         const purchase = document.getElementById("purchase-input").value.trim();
         let phone      = document.getElementById("phone-input").value.trim();
         const email    = document.getElementById("email-input").value.trim();
 
-        if(!sn || !dealer || !customer || !purchase || !phone){
+        if(!sn || !customer || !purchase || !phone){
           showError(t('errorFillAll'));
           return;
         }
@@ -506,7 +428,7 @@
           return;
         }
 
-        registrationFormData = { sn, dealer, customer, purchase, phone, email, lang: currentLang };
+        registrationFormData = { sn, customer, purchase, phone, email, lang: currentLang };
 
         hideMessages();
         const btn=document.getElementById("verify-btn");
@@ -617,18 +539,6 @@
       <div class="card">
         <form onsubmit="return false;">
 
-          <div class="form-group" id="dealer-select-group">
-            <label for="dealer-select">Dealer Name *</label>
-            <select id="dealer-select">
-              <option value="">Loading dealers...</option>
-            </select>
-          </div>
-
-          <div class="form-group hidden" id="dealer-other-group">
-            <label for="dealer-other-input">Other Dealer Name *</label>
-            <input id="dealer-other-input">
-          </div>
-
           <div class="form-group">
             <label for="customer-input">Customer Name *</label>
             <input id="customer-input" required>
@@ -663,4 +573,3 @@
   </div>
 </body>
 </html>
-
